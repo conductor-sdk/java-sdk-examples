@@ -21,3 +21,38 @@ Run the main program
 
 ```
 
+## Workflow Definition
+![Hello World Workflow](src/main/resources/workflow.png)
+```json
+{
+  "name": "HelloWorld",
+  "description": "Hello Workflow!",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "hello_world_task",
+      "taskReferenceName": "hello_world_task",
+      "inputParameters": {
+        "name": "${workflow.input.name}"
+      },
+      "type": "SIMPLE",
+      "optional": false
+    }
+  ],
+  "outputParameters": {
+    "workflow_output": "${hello_world_task.output}"
+  },
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "ownerEmail": "viren@orkes.io",
+  "timeoutPolicy": "ALERT_ONLY"
+}
+```
+
+## Worker
+See [HelloWorld.java](src/main/java/io/orkes/samples/quickstart/HelloWorld.java) for the Worker implementation
+
+## Workflow Management
+See [WorkflowManagement.java](src/main/java/io/orkes/samples/quickstart/WorkflowManagement.java) 
+for example of how to create a workflow definition form a JSON file and execute a workflow.

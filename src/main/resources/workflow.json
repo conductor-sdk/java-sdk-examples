@@ -10,18 +10,9 @@
         "name": "${workflow.input.name}"
       },
       "type": "SIMPLE",
-      "decisionCases": {},
-      "defaultCase": [],
-      "forkTasks": [],
-      "startDelay": 0,
-      "joinOn": [],
-      "optional": false,
-      "defaultExclusiveJoinTask": [],
-      "asyncComplete": false,
-      "loopOver": []
+      "optional": false
     }
   ],
-  "inputParameters": [],
   "outputParameters": {
     "workflow_output": "${hello_world_task.output}"
   },
@@ -29,8 +20,5 @@
   "restartable": true,
   "workflowStatusListenerEnabled": false,
   "ownerEmail": "viren@orkes.io",
-  "timeoutPolicy": "ALERT_ONLY",
-  "timeoutSeconds": 0,
-  "variables": {},
-  "inputTemplate": {}
+  "timeoutPolicy": "ALERT_ONLY"
 }
