@@ -1,8 +1,13 @@
+buildscript {
+    dependencies {
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.+'
+    }
+}
+
 plugins {
-    id 'org.springframework.boot' version '2.5.5'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'application'
+    id "com.diffplug.spotless" version "5.0.0"
 }
 
 ext {
@@ -12,8 +17,11 @@ ext {
             guava      : '31.0.1-jre',
             im4java    : '1.4.0',
             log4j      : '2.17.1!!',
+            slf4j      : '1.7.36',
             protobuf   : '3.19.4',
-            awsSdkBom  : '1.12+'
+            commons    : '3.12.0',
+            lombok     : '1.18.24',
+            jackson    : '2.11.4!!'
     ]
 }
 
@@ -29,7 +37,6 @@ application {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
 
     implementation "org.apache.logging.log4j:log4j-api:${versions.log4j}"
     implementation "org.apache.logging.log4j:log4j-core:${versions.log4j}"
@@ -38,25 +45,21 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-web:${versions.log4j}"
 
     implementation "io.orkes.conductor:orkes-conductor-client:${versions.orkesClient}"
-    implementation 'com.netflix.conductor:conductor-common:3.8.1'
-    implementation 'com.netflix.conductor:conductor-client:3.8.1'
+    implementation "org.slf4j:slf4j-api:${versions.slf4j}"
+    implementation "org.slf4j:slf4j-simple:${versions.slf4j}"
+    implementation "org.apache.commons:commons-lang3:${versions.commons}"
 
-    implementation "org.im4java:im4java:${versions.im4java}"
-    implementation "com.google.guava:guava:${versions.guava}"
-    implementation "com.google.protobuf:protobuf-java:${versions.protobuf}"
-    implementation 'org.apache.commons:commons-lang3'
-    implementation platform("com.amazonaws:aws-java-sdk-bom:${versions.awsSdkBom}")
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}"
+    implementation "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}"
 
-    implementation 'com.amazonaws:aws-java-sdk-s3'
-    implementation 'com.amazonaws:aws-java-sdk-sts'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+    compileOnly "org.projectlombok:lombok:${versions.lombok}"
 
     // test dependencies
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testCompileOnly 'org.projectlombok:lombok'
+//    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 test {
@@ -69,4 +72,14 @@ configurations {
         exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
     }
 }
+
+spotless {
+    java {
+        googleJavaFormat().aosp()
+        removeUnusedImports()
+        importOrder('java', 'javax', 'org', 'com.netflix', 'io.orkes','', '\\#com.netflix', '\\#')
+        licenseHeaderFile("$rootDir/licenseheader.txt")
+    }
+}
+build.dependsOn(spotlessApply)
 
