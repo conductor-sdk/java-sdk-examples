@@ -1,0 +1,36 @@
+{
+  "name": "HelloWorld",
+  "description": "Hello Workflow!",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "hello_world_task",
+      "taskReferenceName": "hello_world_task",
+      "inputParameters": {
+        "name": "${workflow.input.name}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": []
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {
+    "workflow_output": "${hello_world_task.output}"
+  },
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "ownerEmail": "viren@orkes.io",
+  "timeoutPolicy": "ALERT_ONLY",
+  "timeoutSeconds": 0,
+  "variables": {},
+  "inputTemplate": {}
+}
