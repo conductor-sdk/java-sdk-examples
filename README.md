@@ -21,8 +21,15 @@ Run the main program
 
 ```
 
+## Worker
+See [HelloWorld.java](src/main/java/io/orkes/samples/quickstart/HelloWorld.java) for the Worker implementation
+
+## Workflow Management
+See [WorkflowManagement.java](src/main/java/io/orkes/samples/quickstart/WorkflowManagement.java) 
+for example of how to create a workflow definition form a JSON file and execute a workflow.
+
 ## Workflow Definition
-![Hello World Workflow](src/main/resources/workflow.png)
+
 ```json
 {
   "name": "HelloWorld",
@@ -50,9 +57,4 @@ Run the main program
 }
 ```
 
-## Worker
-See [HelloWorld.java](src/main/java/io/orkes/samples/quickstart/HelloWorld.java) for the Worker implementation
-
-## Workflow Management
-See [WorkflowManagement.java](src/main/java/io/orkes/samples/quickstart/WorkflowManagement.java) 
-for example of how to create a workflow definition form a JSON file and execute a workflow.
+![Hello World Workflow](src/main/resources/workflow.png)
