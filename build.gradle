@@ -38,13 +38,14 @@ application {
 
 dependencies {
 
+    implementation "io.orkes.conductor:orkes-conductor-client:${versions.orkesClient}"
+    
     implementation "org.apache.logging.log4j:log4j-api:${versions.log4j}"
     implementation "org.apache.logging.log4j:log4j-core:${versions.log4j}"
     implementation "org.apache.logging.log4j:log4j-jul:${versions.log4j}"
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${versions.log4j}"
     implementation "org.apache.logging.log4j:log4j-web:${versions.log4j}"
 
-    implementation "io.orkes.conductor:orkes-conductor-client:${versions.orkesClient}"
     implementation "org.slf4j:slf4j-api:${versions.slf4j}"
     implementation "org.slf4j:slf4j-simple:${versions.slf4j}"
     implementation "org.apache.commons:commons-lang3:${versions.commons}"
@@ -55,11 +56,6 @@ dependencies {
 
     annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
     compileOnly "org.projectlombok:lombok:${versions.lombok}"
-
-    // test dependencies
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    testCompileOnly 'org.projectlombok:lombok'
-//    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 test {
