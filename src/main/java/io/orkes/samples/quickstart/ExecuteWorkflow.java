@@ -12,27 +12,25 @@
  */
 package io.orkes.samples.quickstart;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
-
-import org.apache.commons.lang3.StringUtils;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.conductor.common.config.ObjectMapperProvider;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
-import com.netflix.conductor.common.run.Workflow;
-
 import io.orkes.conductor.client.*;
 import io.orkes.conductor.client.automator.TaskRunnerConfigurer;
+import io.orkes.conductor.client.model.WorkflowRun;
+import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-@Slf4j
-public class WorkflowManagement {
+public class ExecuteWorkflow {
 
     private static final String CONDUCTOR_SERVER_URL = "https://play.orkes.io/api";
 
@@ -43,41 +41,56 @@ public class WorkflowManagement {
 
     private final TaskClient taskClient;
 
-    private final WorkflowMonitor workflowMonitor;
-
     private TaskRunnerConfigurer taskRunner;
 
-    public WorkflowManagement(ApiClient apiClient) {
+    public ExecuteWorkflow() {
+
+        String key = System.getenv("KEY");
+        String secret = System.getenv("SECRET");
+        String conductorServer = System.getenv("CONDUCTOR_SERVER_URL");
+        if (conductorServer == null) {
+            conductorServer = CONDUCTOR_SERVER_URL;
+        }
+
+        ApiClient apiClient = new ApiClient(conductorServer, key, secret);
+        if (StringUtils.isBlank(key) || StringUtils.isBlank(secret)) {
+            System.out.println(
+                    "\n\nMissing KEY and|or SECRET.  Attemping to connect to "
+                            + conductorServer
+                            + " without authentication\n\n");
+            apiClient = new ApiClient(conductorServer);
+        }
+
         OrkesClients orkesClients = new OrkesClients(apiClient);
         this.metadataClient = orkesClients.getMetadataClient();
         this.workflowClient = orkesClients.getWorkflowClient();
         this.taskClient = orkesClients.getTaskClient();
-        this.workflowMonitor = new WorkflowMonitor(this.workflowClient);
     }
 
     private WorkflowDef registerWorkflowDef() throws IOException {
-        InputStream is = WorkflowManagement.class.getResourceAsStream("/workflow.json");
+        InputStream is = ExecuteWorkflow.class.getResourceAsStream("/workflow.json");
         WorkflowDef workflowDef = objectMapper.readValue(is, WorkflowDef.class);
         metadataClient.registerWorkflowDef(workflowDef, true);
         return workflowDef;
     }
 
-    private String startWorkflow(String name, Integer version, Map<String, Object> input) {
+    /**
+     * Similar to start workflow, but returns a future that completes when the workflow reaches the terminal state.
+     * @param name
+     * @param version
+     * @param input
+     * @return
+     */
+    private CompletableFuture<WorkflowRun> executeWorkflow(
+            String name, Integer version, Map<String, Object> input) {
 
         StartWorkflowRequest request = new StartWorkflowRequest();
         request.setName(name);
         request.setVersion(version);
         request.setCorrelationId(UUID.randomUUID().toString());
         request.setInput(input);
-        String workflowId = workflowClient.startWorkflow(request);
 
-        return workflowId;
-    }
-
-    private CompletableFuture<Workflow> executeWorkflow(
-            String name, Integer version, Map<String, Object> input) {
-        String workflowId = startWorkflow(name, version, input);
-        return workflowMonitor.monitorForCompletion(workflowId);
+        return workflowClient.executeWorkflow(request, null);
     }
 
     private void startWorkers() {
@@ -93,32 +106,17 @@ public class WorkflowManagement {
 
     public static void main(String[] args) throws IOException {
 
-        String key = System.getenv("KEY");
-        String secret = System.getenv("SECRET");
-        String conductorServer = System.getenv("CONDUCTOR_SERVER_URL");
-        if (conductorServer == null) {
-            conductorServer = CONDUCTOR_SERVER_URL;
-        }
+        ExecuteWorkflow workflowManagement = new ExecuteWorkflow();
 
-        ApiClient apiClient = new ApiClient(conductorServer, key, secret);
-        if (StringUtils.isBlank(key) || StringUtils.isBlank(secret)) {
-            log.warn(
-                    "\n\nMissing KEY and|or SECRET.  Attemping to connect to "
-                            + conductorServer
-                            + " without authentication\n\n");
-            apiClient = new ApiClient(conductorServer);
-        }
-
-        WorkflowManagement workflowManagement = new WorkflowManagement(apiClient);
         // Start polling for task workers
         workflowManagement.startWorkers();
 
         WorkflowDef workflowDef = workflowManagement.registerWorkflowDef();
         Map<String, Object> input = new HashMap<>();
         input.put("name", System.getProperty("user.name"));
-        CompletableFuture<Workflow> future =
-                workflowManagement.executeWorkflow(
-                        workflowDef.getName(), workflowDef.getVersion(), input);
+
+        CompletableFuture<WorkflowRun> future =
+                workflowManagement.executeWorkflow(workflowDef.getName(), workflowDef.getVersion(), input);
         future.thenAccept(
                 workflow -> {
                     try {
@@ -126,8 +124,8 @@ public class WorkflowManagement {
                                 objectMapper
                                         .writerWithDefaultPrettyPrinter()
                                         .writeValueAsString(workflow.getOutput());
-                        log.info(
-                                "\n\n\n\nCompleted execution.  Workflow Id {} \n with output \n{} \n\n",
+                        System.out.printf(
+                                "\n\n\n\nCompleted execution.  Workflow Id %s \n with output \n%s \n\n",
                                 workflow.getWorkflowId(),
                                 formattedOutput);
                     } catch (JsonProcessingException e) {

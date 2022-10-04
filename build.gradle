@@ -13,7 +13,7 @@ plugins {
 ext {
     appVersion = '1.0-SNAPSHOT'
     versions = [
-            orkesClient: '1.0.4',
+            orkesClient: '1.0.7',
             guava      : '31.0.1-jre',
             im4java    : '1.4.0',
             log4j      : '2.17.1!!',
@@ -39,34 +39,15 @@ application {
 dependencies {
 
     implementation "io.orkes.conductor:orkes-conductor-client:${versions.orkesClient}"
-    
-    implementation "org.apache.logging.log4j:log4j-api:${versions.log4j}"
-    implementation "org.apache.logging.log4j:log4j-core:${versions.log4j}"
-    implementation "org.apache.logging.log4j:log4j-jul:${versions.log4j}"
-    implementation "org.apache.logging.log4j:log4j-to-slf4j:${versions.log4j}"
-    implementation "org.apache.logging.log4j:log4j-web:${versions.log4j}"
-
-    implementation "org.slf4j:slf4j-api:${versions.slf4j}"
-    implementation "org.slf4j:slf4j-simple:${versions.slf4j}"
     implementation "org.apache.commons:commons-lang3:${versions.commons}"
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}"
     implementation "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}"
-
-    annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
-    compileOnly "org.projectlombok:lombok:${versions.lombok}"
 }
 
 test {
     useJUnitPlatform()
-}
-
-configurations {
-    all {
-        exclude group: 'com.github.vmg.protogen', module: 'protogen-annotations'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
-    }
 }
 
 spotless {
