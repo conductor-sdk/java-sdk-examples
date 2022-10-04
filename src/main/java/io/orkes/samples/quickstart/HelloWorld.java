@@ -32,4 +32,9 @@ public class HelloWorld implements Worker {
         result.setStatus(TaskResult.Status.COMPLETED);
         return result;
     }
+
+    @Override
+    public int getPollingInterval() {
+        return 1;
+    }
 }
