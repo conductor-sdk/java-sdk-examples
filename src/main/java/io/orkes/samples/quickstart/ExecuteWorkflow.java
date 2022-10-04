@@ -53,6 +53,10 @@ public class ExecuteWorkflow {
         }
 
         ApiClient apiClient = new ApiClient(conductorServer, key, secret);
+
+        //Set this to at-least the no. of parallel execution calls being made
+        apiClient.setExecutorThreads(100);
+
         if (StringUtils.isBlank(key) || StringUtils.isBlank(secret)) {
             System.out.println(
                     "\n\nMissing KEY and|or SECRET.  Attemping to connect to "
@@ -98,7 +102,10 @@ public class ExecuteWorkflow {
         TaskRunnerConfigurer.Builder builder =
                 new TaskRunnerConfigurer.Builder(taskClient, List.of(new HelloWorld()));
 
-        taskRunner = builder.withThreadCount(100).withTaskPollTimeout(5).build();
+        taskRunner = builder
+                .withThreadCount(100)
+                .withTaskPollTimeout(5)
+                .build();
 
         // Start Polling for tasks and execute them
         taskRunner.init();
