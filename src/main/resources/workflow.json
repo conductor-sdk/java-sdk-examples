@@ -5,7 +5,7 @@
   "tasks": [
     {
       "name": "hello_world_task",
-      "taskReferenceName": "hello_world_task",
+      "taskReferenceName": "hello_world_task1",
       "inputParameters": {
         "name": "${workflow.input.name}"
       },

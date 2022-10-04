@@ -78,24 +78,6 @@ public class ExecuteWorkflow {
         return workflowDef;
     }
 
-    /**
-     * Similar to start workflow, but returns a future that completes when the workflow reaches the terminal state.
-     * @param name
-     * @param version
-     * @param input
-     * @return
-     */
-    private CompletableFuture<WorkflowRun> executeWorkflow(
-            String name, Integer version, Map<String, Object> input) {
-
-        StartWorkflowRequest request = new StartWorkflowRequest();
-        request.setName(name);
-        request.setVersion(version);
-        request.setCorrelationId(UUID.randomUUID().toString());
-        request.setInput(input);
-
-        return workflowClient.executeWorkflow(request, null);
-    }
 
     private void startWorkers() {
 
@@ -111,35 +93,42 @@ public class ExecuteWorkflow {
         taskRunner.init();
     }
 
+    public void runSyncWorkflow() {
+
+        Map<String, Object> input = Map.of("name", System.getProperty("user.name"));
+
+        StartWorkflowRequest request = new StartWorkflowRequest();
+        request.setName("HelloWorld");
+        request.setVersion(1);
+        request.setCorrelationId(UUID.randomUUID().toString());
+        request.setInput(input);
+
+        //The second parameter is the name of the task reference name which can be used to wait for a long running
+        //Workflow to complete until that task (inclusive) and return the results
+        CompletableFuture<WorkflowRun> future = workflowClient.executeWorkflow(request, null);
+        future.thenAccept(
+                workflow -> {
+                    System.out.println("Workflow Completed. Execution Time: " + (workflow.getUpdateTime() - workflow.getCreateTime()) + " ms");
+
+                    //Shutdown any background threads
+                    workflowClient.shutdown();
+                    taskRunner.shutdown();
+                });
+    }
+
     public static void main(String[] args) throws IOException {
 
         ExecuteWorkflow workflowManagement = new ExecuteWorkflow();
 
-        // Start polling for task workers
+        //Register the workflow definition
+        workflowManagement.registerWorkflowDef();
+
+
+        //Start worker
         workflowManagement.startWorkers();
 
-        WorkflowDef workflowDef = workflowManagement.registerWorkflowDef();
-        Map<String, Object> input = new HashMap<>();
-        input.put("name", System.getProperty("user.name"));
+        workflowManagement.runSyncWorkflow();
 
-        CompletableFuture<WorkflowRun> future =
-                workflowManagement.executeWorkflow(workflowDef.getName(), workflowDef.getVersion(), input);
-        future.thenAccept(
-                workflow -> {
-                    try {
-                        String formattedOutput =
-                                objectMapper
-                                        .writerWithDefaultPrettyPrinter()
-                                        .writeValueAsString(workflow.getOutput());
-                        System.out.printf(
-                                "\n\n\n\nCompleted execution.  Workflow Id %s \n with output \n%s \n\n",
-                                workflow.getWorkflowId(),
-                                formattedOutput);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        System.exit(0);
-                    }
-                });
+
     }
 }
