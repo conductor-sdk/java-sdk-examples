@@ -55,11 +55,8 @@ Here is the example hello world workflow we will use in this example:
 StartWorkflowRequest request = new StartWorkflowRequest();
 request.setName("HelloWorld");
 request.setVersion(1);
-request.setCorrelationId(UUID.randomUUID().toString());
 request.setInput(input);
 
-//The second parameter is the name of the task reference name which can be used to wait for a long running
-//Workflow to complete until that task (inclusive) and return the results
 CompletableFuture<WorkflowRun> future = workflowClient.executeWorkflow(request, null);
         
 ```
