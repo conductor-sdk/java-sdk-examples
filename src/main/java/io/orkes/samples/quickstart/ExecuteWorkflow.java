@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class ExecuteWorkflow {
 
@@ -38,9 +41,8 @@ public class ExecuteWorkflow {
 
     private final MetadataClient metadataClient;
     private final WorkflowClient workflowClient;
-
     private final TaskClient taskClient;
-
+    private ApiClient apiClient;
     private TaskRunnerConfigurer taskRunner;
 
     public ExecuteWorkflow() {
@@ -52,7 +54,8 @@ public class ExecuteWorkflow {
             conductorServer = CONDUCTOR_SERVER_URL;
         }
 
-        ApiClient apiClient = new ApiClient(conductorServer, key, secret);
+        apiClient = new ApiClient(conductorServer, key, secret);
+        apiClient.setReadTimeout(30_000);
 
         //Set this to at-least the no. of parallel execution calls being made
         apiClient.setExecutorThreads(100);
@@ -85,7 +88,7 @@ public class ExecuteWorkflow {
                 new TaskRunnerConfigurer.Builder(taskClient, List.of(new HelloWorld()));
 
         taskRunner = builder
-                .withThreadCount(100)
+                .withThreadCount(1)
                 .withTaskPollTimeout(5)
                 .build();
 
@@ -93,10 +96,9 @@ public class ExecuteWorkflow {
         taskRunner.init();
     }
 
-    public void runSyncWorkflow() {
+    public void runSyncWorkflow() throws ExecutionException, InterruptedException, TimeoutException {
 
         Map<String, Object> input = Map.of("name", System.getProperty("user.name"));
-
         StartWorkflowRequest request = new StartWorkflowRequest();
         request.setName("HelloWorld");
         request.setVersion(1);
@@ -106,27 +108,33 @@ public class ExecuteWorkflow {
         //The second parameter is the name of the task reference name which can be used to wait for a long running
         //Workflow to complete until that task (inclusive) and return the results
         CompletableFuture<WorkflowRun> future = workflowClient.executeWorkflow(request, null);
-        future.thenAccept(
-                workflow -> {
-                    System.out.println("Workflow Completed. Execution Time: " + (workflow.getUpdateTime() - workflow.getCreateTime()) + " ms");
+        WorkflowRun workflow = future.get(30, TimeUnit.SECONDS);
+        System.out.println();
+        System.out.println("=======================================================================================");
+        System.out.println("Workflow Execution Completed");
+        System.out.println("Workflow Id: " + workflow.getWorkflowId());
+        System.out.println("Workflow Status: " + workflow.getStatus());
+        System.out.println("Workflow Output: " + workflow.getOutput());
+        String url = apiClient.getBasePath().replaceAll("api", "") + "execution/" + workflow.getWorkflowId();
+        System.out.println("Workflow Execution Flow UI: " + url);
+        System.out.println("=======================================================================================");
 
-                    //Shutdown any background threads
-                    workflowClient.shutdown();
-                    taskRunner.shutdown();
-                });
+        //Shutdown any background threads
+        workflowClient.shutdown();
+        taskRunner.shutdown();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         ExecuteWorkflow workflowManagement = new ExecuteWorkflow();
 
         //Register the workflow definition
         workflowManagement.registerWorkflowDef();
 
-
         //Start worker
         workflowManagement.startWorkers();
 
+        //Run the workflow
         workflowManagement.runSyncWorkflow();
 
 

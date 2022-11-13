@@ -30,11 +30,12 @@ public class HelloWorld implements Worker {
         result.addOutputData("hw_response", "Hello, " + name);
 
         result.setStatus(TaskResult.Status.COMPLETED);
+        System.out.println("...Completed executing " + task.getTaskId());
         return result;
     }
 
     @Override
     public int getPollingInterval() {
-        return 1;
+        return 10;
     }
 }

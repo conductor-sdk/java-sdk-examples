@@ -14,6 +14,7 @@ package io.orkes.samples.quickstart;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.netflix.conductor.common.config.ObjectMapperProvider;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -42,6 +43,8 @@ public class StartAsyncWorkflow {
 
     private final TaskClient taskClient;
 
+    private ApiClient apiClient;
+
     private TaskRunnerConfigurer taskRunner;
 
     public StartAsyncWorkflow() {
@@ -53,7 +56,7 @@ public class StartAsyncWorkflow {
             conductorServer = CONDUCTOR_SERVER_URL;
         }
 
-        ApiClient apiClient = new ApiClient(conductorServer, key, secret);
+        this.apiClient = new ApiClient(conductorServer, key, secret);
         if (StringUtils.isBlank(key) || StringUtils.isBlank(secret)) {
             System.out.println(
                     "\n\nMissing KEY and|or SECRET.  Attemping to connect to "
@@ -105,7 +108,7 @@ public class StartAsyncWorkflow {
         taskRunner.init();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         StartAsyncWorkflow startAsyncWorkflow = new StartAsyncWorkflow();
 
@@ -119,7 +122,9 @@ public class StartAsyncWorkflow {
         System.out.println("Started workflow with Id: " + workflowId);
 
         Workflow workflow = startAsyncWorkflow.workflowClient.getWorkflow(workflowId, true);
-        System.out.println("Current state of the workflow " + workflow);
+        System.out.println("STarted a workfow, with id " + workflow.getWorkflowId());
+        System.out.println("You can check the execution: "  +  startAsyncWorkflow.apiClient.getBasePath().replaceAll("api", "") + "execution/" + workflow.getWorkflowId());
+
 
         System.exit(0);
 

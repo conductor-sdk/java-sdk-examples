@@ -24,9 +24,8 @@ Run the main program
 ## Worker
 See [HelloWorld.java](src/main/java/io/orkes/samples/quickstart/HelloWorld.java) for the Worker implementation
 
-## Workflow Management
-See [WorkflowManagement.java](src/main/java/io/orkes/samples/quickstart/WorkflowManagement.java) 
-for example of how to create a workflow definition form a JSON file and execute a workflow.
+## Executing Workflows
+Here is the example hello world workflow we will use in this example:
 
 ## Workflow Definition
 
@@ -48,13 +47,21 @@ for example of how to create a workflow definition form a JSON file and execute 
   ],
   "outputParameters": {
     "workflow_output": "${hello_world_task.output}"
-  },
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": false,
-  "ownerEmail": "viren@orkes.io",
-  "timeoutPolicy": "ALERT_ONLY"
+  }
 }
 ```
+### Execute the workflow
+```java
+StartWorkflowRequest request = new StartWorkflowRequest();
+request.setName("HelloWorld");
+request.setVersion(1);
+request.setCorrelationId(UUID.randomUUID().toString());
+request.setInput(input);
 
+//The second parameter is the name of the task reference name which can be used to wait for a long running
+//Workflow to complete until that task (inclusive) and return the results
+CompletableFuture<WorkflowRun> future = workflowClient.executeWorkflow(request, null);
+        
+```
+See [ExecuteWorkflow.java](src/main/java/io/orkes/samples/quickstart/ExecuteWorkflow.java) for the complete code
 ![Hello World Workflow](src/main/resources/workflow.png)
