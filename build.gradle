@@ -33,7 +33,7 @@ repositories {
 }
 
 application {
-    mainClassName = 'io.orkes.samples.quickstart.WorkflowManagement'
+    mainClassName = 'io.orkes.samples.quickstart.ExecuteWorkflow'
 }
 
 dependencies {
@@ -44,6 +44,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}"
     implementation "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}"
+    implementation "com.google.guava:guava:${versions.guava}"
 }
 
 test {
