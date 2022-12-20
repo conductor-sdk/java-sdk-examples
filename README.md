@@ -22,7 +22,7 @@ Run the main program
 ## Workflow
 We create a simple 2-step workflow that fetches the user details and sends an email.
 
-<table><tr><th>Visual</th><th>Code</th><th>JSON</th></tr>
+<table><tr><th>Visual</th><th>Code</th></tr>
 
 <tr>
 <td width="220px"><img src="src/main/resources/workflow.png"></td>
@@ -46,34 +46,6 @@ We create a simple 2-step workflow that fetches the user details and sends an em
 
     workflow.add(getUserDetails);
     workflow.add(sendEmail);
-</pre>
-</td>
-<td>
-<pre>
-{
-  "name": "email_send_workflow",
-  "version": 1,
-  "tasks": [
-    {
-      "name": "get_user_info",
-      "taskReferenceName": "get_user_info",
-      "inputParameters": {
-        "userId": "${workflow.input.userId}"
-      },
-      "type": "SIMPLE"
-    },
-    {
-      "name": "send_email",
-      "taskReferenceName": "send_email",
-      "inputParameters": {
-        "email": "${get_user_info.output.email}"
-      },
-      "type": "SIMPLE"
-    }
-  ],
-  "inputParameters": ["userId"],
-  "schemaVersion": 2
-}
 </pre>
 </td>
 </tr>
