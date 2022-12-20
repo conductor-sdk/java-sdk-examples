@@ -14,6 +14,7 @@ package io.orkes.samples.quickstart.workflow;
 
 import com.netflix.conductor.sdk.workflow.def.ConductorWorkflow;
 import com.netflix.conductor.sdk.workflow.def.tasks.SimpleTask;
+import com.netflix.conductor.sdk.workflow.def.tasks.Switch;
 import com.netflix.conductor.sdk.workflow.executor.WorkflowExecutor;
 
 public class WorkflowCreator {
@@ -46,4 +47,31 @@ public class WorkflowCreator {
 
         return workflow;
     }
+    public ConductorWorkflow<WorkflowInput> createComplexWorkflow() {
+        ConductorWorkflow<WorkflowInput> workflow = new ConductorWorkflow<>(executor);
+        workflow.setName("user_notification");
+        workflow.setVersion(1);
+
+        SimpleTask getUserDetails = new SimpleTask("get_user_info", "get_user_info");
+        getUserDetails.input("userId", "${workflow.input.userId}");
+
+        SimpleTask sendEmail = new SimpleTask("send_email", "send_email");
+        // get user details user info, which contains the email field
+        sendEmail.input("email", "${get_user_info.output.email}");
+
+        SimpleTask sendSMS = new SimpleTask("send_sms", "send_sms");
+        // get user details user info, which contains the phone Number field
+        sendSMS.input("phoneNumber", "${get_user_info.output.phoneNumber}");
+
+        Switch emailOrSMS = new Switch("emailorsms", "${workflow.input.notificationPref}")
+                .switchCase(WorkflowInput.NotificationPreference.EMAIL.name(), sendEmail)
+                .switchCase(WorkflowInput.NotificationPreference.SMS.name(), sendSMS);
+
+        workflow.add(getUserDetails);
+        workflow.add(emailOrSMS);
+
+        return workflow;
+
+    }
+
 }

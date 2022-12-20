@@ -34,10 +34,12 @@ public class Main {
     public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
         SDKUtils utils = new SDKUtils();
         WorkflowCreator workflowCreator = new WorkflowCreator(utils.getWorkflowExecutor());
-        ConductorWorkflow<WorkflowInput> simpleWorkflow = workflowCreator.createSimpleWorkflow();
+        ConductorWorkflow<WorkflowInput> simpleWorkflow = workflowCreator.createComplexWorkflow();
         simpleWorkflow.setVariables(new HashMap<>());
 
-        CompletableFuture<Workflow> workflowExecution = simpleWorkflow.executeDynamic(new WorkflowInput("userA"));
+        WorkflowInput input = new WorkflowInput("userA");
+        input.setNotificationPref(WorkflowInput.NotificationPreference.EMAIL);
+        CompletableFuture<Workflow> workflowExecution = simpleWorkflow.executeDynamic(input);
         Workflow workflowRun = workflowExecution.get(10, TimeUnit.SECONDS);
 
         System.out.println();

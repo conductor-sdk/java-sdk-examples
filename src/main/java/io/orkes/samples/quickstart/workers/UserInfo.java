@@ -20,12 +20,13 @@ public class UserInfo {
 
     private String email;
 
+    private String phoneNumber;
+
     public UserInfo() {}
 
-    public UserInfo(String name, String id, String email) {
+    public UserInfo(String name, String id) {
         this.name = name;
         this.id = id;
-        this.email = email;
     }
 
     public String getName() {
@@ -50,5 +51,13 @@ public class UserInfo {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

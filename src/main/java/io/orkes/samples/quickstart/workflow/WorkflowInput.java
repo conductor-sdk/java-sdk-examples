@@ -14,7 +14,12 @@ package io.orkes.samples.quickstart.workflow;
 
 public class WorkflowInput {
 
+    public enum NotificationPreference {
+        SMS, EMAIL
+    }
     private String userId;
+
+    private NotificationPreference notificationPref = NotificationPreference.SMS;
 
     public WorkflowInput(String userId) {
         this.userId = userId;
@@ -26,5 +31,13 @@ public class WorkflowInput {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public NotificationPreference getNotificationPref() {
+        return notificationPref;
+    }
+
+    public void setNotificationPref(NotificationPreference notificationPref) {
+        this.notificationPref = notificationPref;
     }
 }

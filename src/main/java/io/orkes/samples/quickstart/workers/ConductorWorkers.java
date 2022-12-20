@@ -19,11 +19,19 @@ public class ConductorWorkers {
 
     @WorkerTask("get_user_info")
     public UserInfo getUserInfo(@InputParam("userId") String userId) {
-        return new UserInfo("User X", userId, userId + "@example.com");
+        UserInfo userInfo =  new UserInfo("User X", userId);
+        userInfo.setEmail(userId + "@example.com");
+        userInfo.setPhoneNumber("555-555-5555");
+        return userInfo;
     }
 
     @WorkerTask("send_email")
     public void sendEmail(@InputParam("email") String email) {
         System.out.println("Sending email to " + email);
+    }
+
+    @WorkerTask("send_sms")
+    public void sendSMS(@InputParam("phoneNumber") String phoneNumber) {
+        System.out.println("Sending sms to " + phoneNumber);
     }
 }
