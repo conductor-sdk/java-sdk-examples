@@ -1,6 +1,4 @@
 {
-  "createTime": 0,
-  "updateTime": 0,
   "name": "email_send_workflow",
   "version": 1,
   "tasks": [
