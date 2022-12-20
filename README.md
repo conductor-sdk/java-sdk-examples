@@ -24,7 +24,7 @@ We create a simple 2-step workflow that fetches the user details and sends an em
 
 <table><tr><th>Visual</th><th>Code</th></tr>
 <tr>
-<td width="50%"><img src="src/main/resources/workflow.png"></td>
+<td width="50%"><img src="src/main/resources/workflow.png" width="250px"></td>
 <td>
 <pre> 
 ConductorWorkflow<WorkflowInput> workflow = new ConductorWorkflow<>(executor);
