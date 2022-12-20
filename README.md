@@ -23,29 +23,28 @@ Run the main program
 We create a simple 2-step workflow that fetches the user details and sends an email.
 
 <table><tr><th>Visual</th><th>Code</th></tr>
-
 <tr>
-<td width="220px"><img src="src/main/resources/workflow.png"></td>
+<td width="50%"><img src="src/main/resources/workflow.png"></td>
 <td>
-<pre>
-    ConductorWorkflow<WorkflowInput> workflow = new ConductorWorkflow<>(executor);
-    workflow.setName("email_send_workflow");
-    workflow.setVersion(1);
+<pre> 
+ConductorWorkflow<WorkflowInput> workflow = new ConductorWorkflow<>(executor);
+workflow.setName("email_send_workflow");
+workflow.setVersion(1);
 
-    // Step 1, get user details
-    // The implementation is in
-    // io.orkes.samples.quickstart.workers.ConductorWorkers.getUserInfo.
-    // In production case, the workers are deployed separately and scaled based on the workload
-    SimpleTask getUserDetails = new SimpleTask("get_user_info", "get_user_info");
-    getUserDetails.input("userId", "${workflow.input.userId}");
+// Step 1, get user details
+// The implementation is in
+// io.orkes.samples.quickstart.workers.ConductorWorkers.getUserInfo.
+// In production case, the workers are deployed separately and scaled based on the workload
+SimpleTask getUserDetails = new SimpleTask("get_user_info", "get_user_info");
+getUserDetails.input("userId", "${workflow.input.userId}");
 
-    // send email
-    SimpleTask sendEmail = new SimpleTask("send_email", "send_email");
-    // get user details user info, which contains the email field
-    sendEmail.input("email", "${get_user_info.output.email}");
+// send email
+SimpleTask sendEmail = new SimpleTask("send_email", "send_email");
+// get user details user info, which contains the email field
+sendEmail.input("email", "${get_user_info.output.email}");
 
-    workflow.add(getUserDetails);
-    workflow.add(sendEmail);
+workflow.add(getUserDetails);
+workflow.add(sendEmail);
 </pre>
 </td>
 </tr>
