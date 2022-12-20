@@ -1,24 +1,26 @@
 {
-  "name": "HelloWorld",
-  "description": "Hello Workflow!",
+  "createTime": 0,
+  "updateTime": 0,
+  "name": "email_send_workflow",
   "version": 1,
   "tasks": [
     {
-      "name": "hello_world_task",
-      "taskReferenceName": "hello_world_task",
+      "name": "get_user_info",
+      "taskReferenceName": "get_user_info",
       "inputParameters": {
-        "name": "${workflow.input.name}"
+        "userId": "${workflow.input.userId}"
       },
-      "type": "SIMPLE",
-      "optional": false
+      "type": "SIMPLE"
+    },
+    {
+      "name": "send_email",
+      "taskReferenceName": "send_email",
+      "inputParameters": {
+        "email": "${get_user_info.output.email}"
+      },
+      "type": "SIMPLE"
     }
   ],
-  "outputParameters": {
-    "workflow_output": "${hello_world_task.output}"
-  },
-  "schemaVersion": 2,
-  "restartable": true,
-  "workflowStatusListenerEnabled": false,
-  "ownerEmail": "viren@orkes.io",
-  "timeoutPolicy": "ALERT_ONLY"
+  "inputParameters": ["userId"],
+  "schemaVersion": 2
 }

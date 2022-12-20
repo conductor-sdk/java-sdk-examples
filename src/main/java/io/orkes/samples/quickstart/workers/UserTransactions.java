@@ -10,32 +10,32 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.orkes.samples.quickstart;
+package io.orkes.samples.quickstart.workers;
+
+import java.util.HashMap;
 
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 
-public class HelloWorld implements Worker {
+/**
+ * An example worker that is implemented using Worker interface to gain more control over execution
+ * paramters such as polling time, worker identity etc.
+ */
+public class UserTransactions implements Worker {
+
+    private static final String NAME = "get_user_transactions";
+
     @Override
     public String getTaskDefName() {
-        return "hello_world_task";
+        return NAME;
     }
 
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
-
-        String name = (String) task.getInputData().get("name");
-        result.addOutputData("hw_response", "Hello, " + name);
-
         result.setStatus(TaskResult.Status.COMPLETED);
-        System.out.println("...Completed executing " + task.getTaskId());
+        result.setOutputData(new HashMap<>());
         return result;
-    }
-
-    @Override
-    public int getPollingInterval() {
-        return 10;
     }
 }
