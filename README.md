@@ -1,6 +1,18 @@
 # Java Quickstart Example
 This repository contains sample applications that demonstrates the various features of Conductor Java SDK.
 
+## SDK Features
+Java SDK for Conductor allows you to:
+1. Create workflow using Code
+2. Execute workflows synchronously or asynchronously
+3. Create workers for task execution and framework (TaskRunner) for executing workers and communicating with the server.
+4. Support for all the APIs such as
+    1. Managing tasks (poll, update etc.),
+    2. Managing workflows (start, pause, resume, terminate, get status, search etc.)
+    3. Create and update workflow and task metadata
+    4. User and event management
+
+
 ### Running Example
 
 > **Note**
