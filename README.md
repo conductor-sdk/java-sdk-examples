@@ -21,6 +21,7 @@ Run the main program
 
 ## Workflow
 We create a simple 2-step workflow that fetches the user details and sends an email.
+
 ![Workflow](src/main/resources/workflow.png)
 
 Code snippet that creates this workflow:
