@@ -16,7 +16,7 @@ Java SDK for Conductor allows you to:
 ### Running Example
 
 > **Note**
-Obtain KEY and SECRET from the playground or your Conductor server
+Obtain KEY and SECRET from the playground or your Conductor server. [Quick tutorial for playground](https://orkes.io/content/docs/getting-started/concepts/access-control-applications#access-keys)
 
 Export variables
 ```shell
